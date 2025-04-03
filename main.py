@@ -1,3 +1,4 @@
+import ctypes
 import datetime
 import os
 import time
@@ -9,6 +10,19 @@ from pywinauto import Desktop, Application
 
 # Inicjalizacja colorama
 init(autoreset=True)
+
+# Stałe dla MessageBox (z Windows API)
+MB_OK = 0x0
+MB_ICONINFORMATION = 0x40
+MB_ICONWARNING = 0x30
+MB_ICONERROR = 0x10
+
+
+def show_message_box(title, message, style=MB_OK | MB_ICONINFORMATION):
+    """
+    Wyświetla okno dialogowe MessageBox
+    """
+    ctypes.windll.user32.MessageBoxW(0, message, title, style)
 
 
 def log(message, level="INFO"):
@@ -38,9 +52,12 @@ def cleanup_windows():
     log("Sprzątanie otwartych okien...", "INFO")
 
     # Lista tytułów okien do zamknięcia
-    window_titles = [{"title_re": ".*Właściwości.*", "exact": False},
-                     {"title_re": ".*Urządzenia i drukarki.*", "exact": False}, {"title": "Ustawienia", "exact": True},
-                     {"title_re": ".*Panel sterowania.*", "exact": False}]
+    window_titles = [
+        {"title_re": ".*Właściwości.*", "exact": False},
+        {"title_re": ".*Urządzenia i drukarki.*", "exact": False},
+        {"title": "Ustawienia", "exact": True},
+        {"title_re": ".*Panel sterowania.*", "exact": False}
+    ]
 
     for window_info in window_titles:
         try:
@@ -596,10 +613,13 @@ if __name__ == "__main__":
     log("=" * 80, "INFO")
 
     # Uruchamiamy główną funkcję
-    # noinspection PyNoneFunctionAssignment
     success = fix_bluetooth_headphones()
 
     if success:
+        message = "Naprawa zakończona pomyślnie!\n\nOpcja 'Telefon głośnomówiący' została wyłączona.\nSłuchawki zostały ponownie podłączone."
         log("\n✅ Program zakończył się pomyślnie!", "SUCCESS")
+        show_message_box("Naprawa słuchawek - Sukces!", message, MB_OK | MB_ICONINFORMATION)
     else:
+        message = "Wystąpił błąd podczas naprawy słuchawek.\n\nSprawdź konsolę, aby uzyskać więcej informacji."
         log("\n❌ Program napotkał błąd i nie został zakończony pomyślnie.", "ERROR")
+        show_message_box("Naprawa słuchawek - Błąd", message, MB_OK | MB_ICONERROR)

@@ -84,10 +84,14 @@ def build_executable():
             log(f"Nie można usunąć pliku {spec_file}: {e}", "WARNING")
 
     # Konfiguracja parametrów PyInstaller
-    pyinstaller_cmd = ["pyinstaller", "--name=bluetooth_fix", "--onefile",  # Pojedynczy plik EXE
-                       "--windowed",  # Aplikacja okienkowa bez konsoli
-                       "--icon=NONE",  # Można tu dodać ścieżkę do ikony, jeśli jest dostępna
-                       "main.py"]
+    pyinstaller_cmd = [
+        "pyinstaller",
+        "--name=bluetooth_fix",
+        "--onefile",  # Pojedynczy plik EXE
+        "--noconsole",  # Bez okna konsoli
+        "--icon=NONE",  # Można tu dodać ścieżkę do ikony, jeśli jest dostępna
+        "main.py"
+    ]
 
     # Wykonanie komendy PyInstaller
     log("Uruchamiam PyInstaller...", "INFO")
