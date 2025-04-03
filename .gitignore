@@ -1,2 +1,4 @@
 /dist/
 /bluetooth_fix.spec
+/.idea
+/build
