@@ -38,12 +38,9 @@ def cleanup_windows():
     log("Sprzątanie otwartych okien...", "INFO")
 
     # Lista tytułów okien do zamknięcia
-    window_titles = [
-        {"title_re": ".*Właściwości.*", "exact": False},
-        {"title_re": ".*Urządzenia i drukarki.*", "exact": False},
-        {"title": "Ustawienia", "exact": True},
-        {"title_re": ".*Panel sterowania.*", "exact": False}
-    ]
+    window_titles = [{"title_re": ".*Właściwości.*", "exact": False},
+                     {"title_re": ".*Urządzenia i drukarki.*", "exact": False}, {"title": "Ustawienia", "exact": True},
+                     {"title_re": ".*Panel sterowania.*", "exact": False}]
 
     for window_info in window_titles:
         try:
@@ -55,7 +52,7 @@ def cleanup_windows():
             window = app.top_window()
             log(f"Zamykam okno: {window.window_text()}", "INFO")
             window.close()
-            time.sleep(0.2)
+            time.sleep(0.1)  # Zmniejszono czas oczekiwania
         except Exception:
             # Ignorujemy błędy, jeśli okno nie istnieje lub nie można go zamknąć
             pass
@@ -74,7 +71,7 @@ def fix_bluetooth_headphones():
         # Otwieranie ustawień Bluetooth
         log("Otwieram ustawienia Bluetooth...", "INFO")
         os.system("start ms-settings:bluetooth")
-        time.sleep(1)  # Zmniejszony czas oczekiwania
+        time.sleep(0.5)  # Skrócony czas oczekiwania
 
         # Podłączamy się do okna ustawień
         app = Application(backend="uia").connect(title="Ustawienia")
@@ -84,7 +81,7 @@ def fix_bluetooth_headphones():
         log("Przewijam do sekcji 'Powiązane ustawienia'...", "INFO")
         for _ in range(5):
             settings_window.wheel_mouse_input(wheel_dist=-3)
-            time.sleep(0.1)  # Zmniejszony czas oczekiwania
+            time.sleep(0.05)  # Skrócony czas oczekiwania
 
         # Próbujemy różnych metod znalezienia elementu "Więcej ustawień urządzeń i drukarek"
         log("Szukam opcji 'Więcej ustawień urządzeń i drukarek'...", "INFO")
@@ -101,7 +98,7 @@ def fix_bluetooth_headphones():
                         log(f"Znaleziono element: '{element_text}'", "SUCCESS")
                         element.click_input()
                         found = True
-                        time.sleep(1.5)  # Pozostawiamy dłuższy czas na otwarcie okna
+                        time.sleep(0.5)  # Skrócony czas oczekiwania
                         break
                 except Exception:
                     continue
@@ -119,14 +116,14 @@ def fix_bluetooth_headphones():
                             log(f"Znaleziono hiperłącze: {link.window_text()}", "SUCCESS")
                             link.click_input()
                             found = True
-                            time.sleep(1.5)
+                            time.sleep(0.5)
                             break
                     except:
                         continue
             except Exception as e:
                 log(f"Metoda 2 nie powiodła się: {e}", "WARNING")
 
-        # METODA 3: Odszukanie zewnętrznej strzałki (ikony) i kliknięcie na nią
+        # METODA 3: Odszukanie zewnętrznej strzałki (ikony) i kliknięcie nią
         if not found:
             try:
                 log("Szukam ikony zewnętrznej linku...", "INFO")
@@ -139,20 +136,20 @@ def fix_bluetooth_headphones():
                             log(f"Znaleziono przycisk z rodzicem: {parent_text}", "SUCCESS")
                             icon.click_input()
                             found = True
-                            time.sleep(1.5)
+                            time.sleep(0.5)
                             break
                     except:
                         continue
             except Exception as e:
                 log(f"Metoda 3 nie powiodła się: {e}", "WARNING")
 
-        # METODA 4: Bezpośrednie otwarcie Panelu Sterowania - Urządzenia i drukarki
+        # METODA 4: Bezpośrednie otwarcie Panelu Sterowania — Urządzenia i drukarki
         if not found:
             try:
                 log("Otwieram Panel Sterowania - Urządzenia i drukarki bezpośrednio...", "INFO")
                 os.system("control printers")
                 found = True
-                time.sleep(1.5)
+                time.sleep(0.5)
             except Exception as e:
                 log(f"Metoda 4 nie powiodła się: {e}", "WARNING")
 
@@ -167,10 +164,10 @@ def fix_bluetooth_headphones():
                 x = screen_width // 2  # środek ekranu w poziomie
                 y = screen_height // 2 + 100  # nieco poniżej środka ekranu
 
-                # Kliknięcie w przybliżonym miejscu
+                # Kliknięcie przybliżonym miejscu
                 pyautogui.click(x, y)
                 found = True
-                time.sleep(1)
+                time.sleep(0.3)
             except Exception as e:
                 log(f"Metoda 5 nie powiodła się: {e}", "WARNING")
 
@@ -180,15 +177,15 @@ def fix_bluetooth_headphones():
         # Podłączamy się do okna Panelu Sterowania
         log("Podłączam się do okna 'Urządzenia i drukarki'...", "INFO")
         try:
-            devices_app = Application(backend="uia").connect(title_re=".*Urządzenia i drukarki.*", timeout=5)
+            devices_app = Application(backend="uia").connect(title_re=".*Urządzenia i drukarki.*", timeout=2)
             devices_window = devices_app.window(title_re=".*Urządzenia i drukarki.*")
         except Exception as e:
             log(f"Nie można znaleźć okna 'Urządzenia i drukarki': {e}", "WARNING")
 
-            # Próba alternatywna - podłączenie do jakiegokolwiek okna Panelu Sterowania
+            # Próba alternatywna — podłączenie do jakiegokolwiek okna Panelu Sterowania
             try:
                 log("Próba alternatywna - szukam okna Panelu Sterowania...", "INFO")
-                devices_app = Application(backend="uia").connect(title_re=".*Panel sterowania.*", timeout=5)
+                devices_app = Application(backend="uia").connect(title_re=".*Panel sterowania.*", timeout=2)
                 devices_window = devices_app.top_window()
             except Exception as e2:
                 raise Exception(f"Nie można znaleźć okna Panelu Sterowania: {e2}")
@@ -216,7 +213,7 @@ def fix_bluetooth_headphones():
             log("Otwieram właściwości przez podwójne kliknięcie...", "INFO")
             try:
                 bt_device.double_click_input()
-                time.sleep(0.8)
+                time.sleep(0.3)
             except Exception as e:
                 log(f"Podwójne kliknięcie nie powiodło się: {e}", "WARNING")
 
@@ -249,7 +246,7 @@ def fix_bluetooth_headphones():
 
                     # Metoda z PyAutoGUI jako ostateczność
                     try:
-                        # Ostateczne rozwiązanie - kliknięcie w prawy dolny róg okna właściwości
+                        # Ostateczne rozwiązanie — kliknięcie prawy dolny róg okna właściwości
                         mouse_pos = pyautogui.position()
                         # Przesunięcie na dół o 300 pikseli powinno trafić w obszar menu
                         pyautogui.click(mouse_pos.x, mouse_pos.y + 300)
@@ -260,7 +257,7 @@ def fix_bluetooth_headphones():
         except Exception as e:
             raise Exception(f"Problem podczas szukania słuchawek: {e}")
 
-        # Obsługa okna właściwości - próbujemy kilka podejść
+        # Obsługa okna właściwości — próbujemy kilka podejść
         log("Podłączam się do okna właściwości...", "INFO")
         props_window = None
 
@@ -303,7 +300,7 @@ def fix_bluetooth_headphones():
             # Próba 1: Standardowe podejście
             services_tab = props_window.child_window(title="Usługi", control_type="TabItem")
             services_tab.click_input()
-            time.sleep(0.8)  # Krótsze oczekiwanie
+            time.sleep(0.3)  # Bardzo krótkie oczekiwanie
         except Exception as e:
             log(f"Standardowe podejście do zakładki nie zadziałało: {e}", "WARNING")
 
@@ -363,18 +360,18 @@ def fix_bluetooth_headphones():
         except Exception as e:
             log(f"Nie udało się kliknąć 'Telefon głośnomówiący' metodą 1: {e}", "WARNING")
 
-        # METODA 2: Kliknięcie w przybliżone koordynaty na podstawie zrzutu ekranu
+        # METODA 2: Kliknięcie przybliżone koordynaty na podstawie zrzutu ekranu
         if not handsfree_clicked:
             try:
                 log("Próbuję kliknąć opcję 'Telefon głośnomówiący' przez koordynaty...", "INFO")
                 # Bazując na zrzucie ekranu
                 rect = props_window.rectangle()
 
-                # Z zrzutu ekranu widać, że opcja jest mniej więcej w 1/3 okna od góry
+                # Ze zrzutu ekranu widać, że opcja jest mniej więcej w 1/3 okna od góry
                 checkmark_x = rect.left + 40  # Checkbox jest zwykle blisko lewej krawędzi
                 checkmark_y = rect.top + (rect.height() * 0.35)  # Około 1/3 w dół okna
 
-                # Kliknięcie w checkbox
+                # Kliknięcie checkbox
                 pyautogui.click(checkmark_x, checkmark_y)
                 time.sleep(0.3)
                 handsfree_clicked = True
@@ -386,7 +383,7 @@ def fix_bluetooth_headphones():
         if not handsfree_clicked:
             log("Nie udało się kliknąć opcji 'Telefon głośnomówiący'", "WARNING")
 
-        # Klikamy OK - używamy wielu metod i weryfikacji
+        # Klikamy OK — używamy wielu metod i weryfikacji
         log("Zatwierdzam zmiany...", "INFO")
         ok_clicked = False
 
@@ -422,12 +419,12 @@ def fix_bluetooth_headphones():
         if not ok_clicked:
             try:
                 log("Próbuję kliknąć OK przez koordynaty...", "INFO")
-                # Kliknięcie w prawy dolny róg okna
+                # Kliknięcie prawy dolny róg okna
                 rect = props_window.rectangle()
                 ok_x = rect.left + (rect.width() * 0.4)  # Przycisk OK jest zwykle po prawej stronie na dole
                 ok_y = rect.top + rect.height() - 25  # Blisko dolnej krawędzi
 
-                # Kliknięcie w przycisk
+                # Kliknięcie przycisk
                 pyautogui.click(ok_x, ok_y)
                 time.sleep(0.5)
                 ok_clicked = True
@@ -479,7 +476,7 @@ def fix_bluetooth_headphones():
                     continue
 
             if not headphones:
-                # Przewijamy w górę - być może słuchawki są w innym miejscu
+                # Przewijamy w górę — być może słuchawki są w innym miejscu
                 for _ in range(3):
                     settings_window.wheel_mouse_input(wheel_dist=3)
                     time.sleep(0.1)
@@ -594,49 +591,15 @@ def fix_bluetooth_headphones():
         cleanup_windows()
 
 
-def create_wlasciwosci_image():
-    """
-    Tworzy prosty obrazek napisu 'Właściwości' w menu kontekstowym,
-    który potem będzie używany do rozpoznawania tej opcji w menu.
-    """
-    try:
-        import numpy as np
-        from PIL import Image, ImageDraw, ImageFont
-
-        # Tworzenie prostego obrazka
-        img = Image.new('RGB', (120, 24), color=(240, 240, 240))
-        d = ImageDraw.Draw(img)
-
-        # Próba użycia czcionki systemowej (jeśli dostępna)
-        try:
-            font = ImageFont.truetype("segoeui.ttf", 14)
-        except:
-            font = None
-
-        # Narysowanie tekstu
-        d.text((10, 5), "Właściwości", fill=(0, 0, 0), font=font)
-
-        # Zapisanie obrazka
-        img.save('wlasciwosci.png')
-        log("Utworzono plik wlasciwosci.png do rozpoznawania menu", "SUCCESS")
-        return True
-    except Exception as e:
-        log(f"Nie udało się utworzyć pliku obrazu: {e}", "ERROR")
-        return False
-
-
 if __name__ == "__main__":
     log("Program do naprawy słuchawek Bluetooth - eliminacja opcji 'Telefon głośnomówiący'", "INFO")
     log("=" * 80, "INFO")
 
-    # Tworzymy plik obrazu przed uruchomieniem
-    create_wlasciwosci_image()
-
     # Uruchamiamy główną funkcję
+    # noinspection PyNoneFunctionAssignment
     success = fix_bluetooth_headphones()
 
     if success:
         log("\n✅ Program zakończył się pomyślnie!", "SUCCESS")
     else:
         log("\n❌ Program napotkał błąd i nie został zakończony pomyślnie.", "ERROR")
-

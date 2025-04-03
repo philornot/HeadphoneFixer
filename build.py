@@ -1,7 +1,8 @@
 import os
-import sys
 import shutil
 import subprocess
+import sys
+
 from colorama import init, Fore, Style
 
 # Inicjalizacja colorama
@@ -83,15 +84,10 @@ def build_executable():
             log(f"Nie można usunąć pliku {spec_file}: {e}", "WARNING")
 
     # Konfiguracja parametrów PyInstaller
-    pyinstaller_cmd = [
-        "pyinstaller",
-        "--name=bluetooth_fix",
-        "--onefile",  # Pojedynczy plik EXE
-        "--windowed",  # Aplikacja okienkowa bez konsoli
-        "--add-data=wlasciwosci.png;.",  # Dodanie pliku obrazu
-        "--icon=NONE",  # Można tu dodać ścieżkę do ikony, jeśli jest dostępna
-        "main.py"
-    ]
+    pyinstaller_cmd = ["pyinstaller", "--name=bluetooth_fix", "--onefile",  # Pojedynczy plik EXE
+                       "--windowed",  # Aplikacja okienkowa bez konsoli
+                       "--icon=NONE",  # Można tu dodać ścieżkę do ikony, jeśli jest dostępna
+                       "main.py"]
 
     # Wykonanie komendy PyInstaller
     log("Uruchamiam PyInstaller...", "INFO")
@@ -129,25 +125,12 @@ def main():
         log("Nie można kontynuować z powodu brakujących zależności", "ERROR")
         return
 
-    # Upewnij się, że plik obrazu istnieje lub go utwórz
-    if not os.path.exists("wlasciwosci.png"):
-        log("Tworzę plik wlasciwosci.png...", "INFO")
-        try:
-            from main import create_wlasciwosci_image
-            create_wlasciwosci_image()
-        except Exception as e:
-            log(f"Nie można utworzyć pliku wlasciwosci.png: {e}", "WARNING")
-            log("Kontynuuję mimo to...", "WARNING")
-
     # Buduj plik wykonywalny
     if build_executable():
         log("\nPomyślnie utworzono plik EXE!", "SUCCESS")
         log("\nMożesz teraz uruchomić bluetooth_fix.exe z katalogu dist.", "INFO")
     else:
         log("\nNie udało się utworzyć pliku EXE.", "ERROR")
-
-    log("\nNaciśnij Enter, aby zakończyć...", "INFO")
-    input()
 
 
 if __name__ == "__main__":
