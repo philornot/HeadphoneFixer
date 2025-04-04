@@ -1,11 +1,11 @@
-import ctypes
-import datetime
 import os
 import time
 import traceback
+import datetime
+import ctypes
+from colorama import init, Fore, Style
 
 import pyautogui
-from colorama import init, Fore, Style
 from pywinauto import Desktop, Application
 
 # Inicjalizacja colorama
@@ -20,8 +20,41 @@ MB_ICONERROR = 0x10
 
 def show_message_box(title, message, style=MB_OK | MB_ICONINFORMATION):
     """
-    Wyświetla okno dialogowe MessageBox
+    Wyświetla okno dialogowe MessageBox z ikoną aplikacji
     """
+    # Załaduj ikonę jako zasób aplikacji
+    try:
+        import sys
+        if getattr(sys, 'frozen', False):
+            # Aplikacja jest skompilowana przez PyInstaller
+            app_path = sys._MEIPASS
+        else:
+            # Aplikacja działa z kodu źródłowego
+            app_path = os.path.dirname(os.path.abspath(__file__))
+
+        icon_path = os.path.join(app_path, "bluetooth_fix.ico")
+        if os.path.exists(icon_path):
+            # Ustawienie ikony dla okna
+            icon_flags = 0x00000080  # LR_LOADFROMFILE
+            hinst = ctypes.windll.kernel32.GetModuleHandleW(None)
+            icon_handle = ctypes.windll.user32.LoadImageW(
+                hinst,
+                icon_path,
+                1,  # IMAGE_ICON
+                0, 0,
+                icon_flags
+            )
+            # Ustawienie ikony dla wątku
+            ctypes.windll.user32.SendMessageW(
+                0,
+                0x0080,  # WM_SETICON
+                0,  # ICON_SMALL
+                icon_handle
+            )
+    except Exception as e:
+        # W przypadku problemów z ikoną, po prostu użyj domyślnej
+        print(f"Nie można załadować ikony: {e}")
+
     ctypes.windll.user32.MessageBoxW(0, message, title, style)
 
 

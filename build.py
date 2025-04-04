@@ -1,8 +1,7 @@
 import os
+import sys
 import shutil
 import subprocess
-import sys
-
 from colorama import init, Fore, Style
 
 # Inicjalizacja colorama
@@ -83,15 +82,27 @@ def build_executable():
         except Exception as e:
             log(f"Nie można usunąć pliku {spec_file}: {e}", "WARNING")
 
+    # Sprawdź czy mamy ikonę
+    icon_param = "--icon=NONE"
+    if os.path.exists("bluetooth_fix.ico"):
+        log("Znaleziono plik ikony, będzie użyty w aplikacji", "SUCCESS")
+        icon_param = "--icon=bluetooth_fix.ico"
+    else:
+        log("Nie znaleziono pliku ikony bluetooth_fix.ico", "WARNING")
+
     # Konfiguracja parametrów PyInstaller
     pyinstaller_cmd = [
         "pyinstaller",
         "--name=bluetooth_fix",
         "--onefile",  # Pojedynczy plik EXE
         "--noconsole",  # Bez okna konsoli
-        "--icon=NONE",  # Można tu dodać ścieżkę do ikony, jeśli jest dostępna
+        icon_param,
         "main.py"
     ]
+
+    # Dodaj ikonę jako zasób, jeśli istnieje
+    if os.path.exists("bluetooth_fix.ico"):
+        pyinstaller_cmd.append("--add-data=bluetooth_fix.ico;.")
 
     # Wykonanie komendy PyInstaller
     log("Uruchamiam PyInstaller...", "INFO")
