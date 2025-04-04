@@ -53,7 +53,7 @@ Program automatycznie wykonuje sekwencję działań, które zwykle musiałbyś w
 
 ### Metoda 1: Gotowy plik wykonywalny
 
-1. Pobierz najnowszą wersję programu z [sekcji Releases](https://github.com/philornot//releases)
+1. Pobierz najnowszą wersję programu z [sekcji Releases](https://github.com/philornot/HeadphoneFixer/releases/latest)
 2. Rozpakuj archiwum do wybranego katalogu
 3. Uruchom plik `bluetooth_fix.exe`
 
